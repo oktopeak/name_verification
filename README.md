@@ -1,111 +1,155 @@
 # Name Verification Application
 
-A PHP application that generates target names from user prompts and verifies candidate names against them using fuzzy matching algorithms.
+Technical assessment solution for Abode Money - A name verification system with fuzzy matching capabilities.
 
-## Features
+## Quick Start
 
-- **Target Name Generator**: Generate names from free-form prompts (with optional LLM support)
-- **Name Verifier**: Verify candidate names against the latest generated target with confidence scoring
-- **Fuzzy Matching**: Handles typos, nicknames, transliterations, and common variations
-- **Multiple Interfaces**: CLI and Web interfaces
-- **Comprehensive Test Suite**: 30 pre-defined test cases
+### Option 1: Using PHP's Built-in Server (Recommended)
 
-## Requirements
-
-- PHP >= 7.4
-- Composer
-- (Optional) OpenAI API key for LLM-based name generation
-
-## Installation
-
-1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd name-verification
-```
+# Clone the repository
+git clone git@github.com:oktopeak/name_verification.git
+cd name_verification
 
-2. Install dependencies:
-```bash
-composer install
-```
-
-3. (Optional) Set OpenAI API key for LLM generation:
-```bash
-export OPENAI_API_KEY="your-api-key-here"
-```
-
-## Usage
-
-### Web Interface
-
-Start the built-in PHP server:
-```bash
-composer serve
-# or
+# Start the web server
 php -S localhost:8000 index.php
 ```
 
-Then open your browser and navigate to `http://localhost:8000`
+Open your browser and navigate to: **http://localhost:8000**
 
-### CLI Interface
+### Option 2: Command Line Interface
 
-Run the interactive CLI:
 ```bash
-composer cli
-# or
+# Run the interactive CLI
 php cli.php
 ```
 
-CLI Options:
-1. Generate a target name
-2. Verify a candidate name
-3. Show current target name
-4. Clear target name
-5. Run test suite
-6. Exit
+## Testing the Application
 
-### Running Tests
+### Run the Full Test Suite
 
-Execute all 30 test cases:
 ```bash
-composer test
-# or
 php test.php
 ```
 
-The test suite includes:
-- 18 expected matches (nicknames, typos, transliterations)
-- 12 expected non-matches (different names, order swaps)
+**Expected Result:** All 30 test cases should pass (100% success rate)
 
-## Architecture
+### Manual Testing Examples
 
-### Key Components
+#### 1. Generate a Target Name
+**Web Interface:**
+- Enter prompt: "Generate a random Arabic sounding name with an Al and ibn both involved"
+- Click "Generate Name"
 
-1. **NameStorage** (`src/Storage/NameStorage.php`)
-   - Stores the latest generated target name
-   - Simple JSON file-based persistence
+**CLI:**
+- Select option 1
+- Enter the same prompt
 
-2. **NameGenerator** (`src/Generator/NameGenerator.php`)
-   - Generates names from prompts
-   - Supports LLM (OpenAI) or deterministic generation
-   - Automatically saves to storage
+#### 2. Test Matching Cases (Should Match ✅)
 
-3. **NameVerifier** (`src/Verifier/NameVerifier.php`)
-   - Verifies candidates against stored target
-   - Uses multiple matching algorithms:
-     - Levenshtein distance for typos
-     - Soundex for phonetic matching
-     - Nickname mappings
-     - Transliteration handling
-   - Returns match (boolean), confidence (0-100), and reason
+Try these candidate names against generated targets:
 
-### Black Box Design
+| Target Name | Test Candidate | Expected Result |
+|-------------|---------------|-----------------|
+| Tyler Bliha | Tlyer Bilha | ✅ Match (typos) |
+| Bob Ellensworth | Robert Ellensworth | ✅ Match (nickname) |
+| Mohammed Al Fayed | Muhammad Alfayed | ✅ Match (transliteration) |
+| Sarah O'Connor | Sara Oconnor | ✅ Match (punctuation) |
 
-The verifier treats the generator as a black box:
+#### 3. Test Non-Matching Cases (Should NOT Match ❌)
+
+| Target Name | Test Candidate | Expected Result |
+|-------------|---------------|-----------------|
+| Ali Hassan | Hassan Ali | ❌ No Match (order swap) |
+| John Smith | James Smith | ❌ No Match (different name) |
+| Michael Thompson | Michelle Thompson | ❌ No Match (gender difference) |
+| William Carter | Liam Carter | ❌ No Match (no nickname mapping) |
+
+## Features Demonstrated
+
+### ✅ Fuzzy Matching Capabilities
+- **Typos & Misspellings**: Tyler → Tlyer
+- **Nicknames**: Bob → Robert, Liz → Elizabeth
+- **Transliterations**: Mohammed → Muhammad
+- **Case Insensitive**: JOHN → john
+- **Punctuation Handling**: O'Connor → Oconnor
+- **Hyphenation**: Al-Hassan → Al Hassan
+
+### ✅ Correct Rejections
+- Name order swaps (Ali Hassan ≠ Hassan Ali)
+- Gender-specific variations (Michael ≠ Michelle)
+- Different names with same surname
+- Similar prefixes but distinct names (Christopher ≠ Christian)
+
+## Architecture Highlights
+
+### Black Box Design ✅
+The verifier component treats the generator as a **black box**:
 - Only accesses the stored target name string
 - No access to generator context or history
 - Cannot call back into the generator
 - Architecturally isolated components
+
+### Storage
+- Simple JSON file storage in `storage/latest_name.json`
+- Maintains only the latest generated target name
+
+## System Requirements
+
+- **PHP**: Version 7.4 or higher
+- **No external dependencies required** (custom autoloader included)
+- **Optional**: Composer for dependency management
+- **Optional**: OpenAI API key for LLM-based generation (falls back to deterministic generation)
+
+## Adding OpenAI API Key (Optional)
+
+The application works without an API key using deterministic generation. To enable LLM-powered generation:
+
+### Method 1: Edit config.php (Easiest)
+```php
+// Open config.php and add your key:
+'openai_api_key' => 'sk-proj-your-actual-api-key-here',
+```
+
+### Method 2: Environment Variable
+```bash
+# Linux/Mac
+export OPENAI_API_KEY="sk-proj-your-actual-api-key-here"
+
+# Windows
+set OPENAI_API_KEY=sk-proj-your-actual-api-key-here
+```
+
+### Method 3: .env File
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Edit .env and add your key
+OPENAI_API_KEY=sk-proj-your-actual-api-key-here
+```
+
+**Get your API key from:** https://platform.openai.com/api-keys
+
+⚠️ **Security Note:** Never commit your actual API key to version control!
+
+## Installation Options
+
+### Without Composer (Simplest)
+```bash
+# Just clone and run - no installation needed!
+git clone git@github.com:oktopeak/name_verification.git
+cd name_verification
+php -S localhost:8000 index.php
+```
+
+### With Composer (Optional)
+```bash
+git clone git@github.com:oktopeak/name_verification.git
+cd name_verification
+composer install
+composer serve  # Starts web server
+```
 
 ## Matching Algorithm
 

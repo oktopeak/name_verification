@@ -10,9 +10,12 @@ use App\Generator\NameGenerator;
 use App\Verifier\NameVerifier;
 use App\Storage\NameStorage;
 
+// Load configuration
+$config = require __DIR__ . '/config.php';
+
 // Initialize components
-$storage = new NameStorage();
-$apiKey = getenv('OPENAI_API_KEY');
+$storage = new NameStorage($config['storage_path'] ?? 'storage/latest_name.json');
+$apiKey = $config['openai_api_key'] ?? getenv('OPENAI_API_KEY');
 $generator = new NameGenerator($storage, $apiKey);
 $verifier = new NameVerifier($storage);
 

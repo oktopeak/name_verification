@@ -11,9 +11,20 @@ use App\Generator\NameGenerator;
 use App\Verifier\NameVerifier;
 use App\Storage\NameStorage;
 
+// Load configuration
+$config = require __DIR__ . '/config.php';
+
 // Initialize components
-$storage = new NameStorage();
-$apiKey = getenv('OPENAI_API_KEY'); // Optional: set this environment variable to use LLM
+$storage = new NameStorage($config['storage_path'] ?? 'storage/latest_name.json');
+
+// Try to get API key from config first, then environment variable
+$apiKey = $config['openai_api_key'] ?? getenv('OPENAI_API_KEY');
+if ($apiKey) {
+    echo colorize("✓ LLM mode enabled (using OpenAI API)\n", 'green');
+} else {
+    echo colorize("ℹ Using deterministic generation (no API key configured)\n", 'yellow');
+}
+
 $generator = new NameGenerator($storage, $apiKey);
 $verifier = new NameVerifier($storage);
 

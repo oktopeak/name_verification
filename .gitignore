@@ -1,0 +1,36 @@
+# Composer
+/vendor/
+composer.lock
+
+# Storage
+/storage/
+*.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+error_log
+access_log
+
+# Cache
+*.cache
+/cache/
+/tmp/
+
+# Testing
+/coverage/
+.phpunit.result.cache
